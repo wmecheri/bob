@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Selection Page</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <style>
+            /* Hide the entire body until all assets have loaded */
+            body {
+                visibility: hidden;
+            }
+            /* Guessed indicator styling: placed inside the button so it's positioned relative to it */
+            .guessed-indicator {
+                position: absolute;
+                top: 0vh; /* adjust vertical position */
+                left: -4vh; /* adjust horizontal position */
+                width: 10vh; /* fixed size: change this value as desired */
+                height: auto;
+                z-index: 10;
+            }
+            .guessed-indicator img {
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+            }
+        </style>
+    </head>
+    <body class="selection-page">
+        <!-- Top Row: images 2, 3, 4 -->
+        <div class="top-row">
+            <div class="grid-container-top">
+                {% if samples|length > 1 %}
+                <div class="grid-item">
+                    <button
+                        type="button"
+                        style="position: relative"
+                        onclick="handleSelectionClick('{{ url_for('challenge') }}?index={{ samples[1].index }}', 1)"
+                        onmouseover="startBobHover('hover_1.png')"
+                        onmouseout="stopBobHover()"
+                    >
+                        <img
+                            src="data:image/png;base64,{{ samples[1].img_str }}"
+                            alt="Image 2"
+                        />
+                        {% if samples[1].has_guess %}
+                        <div class="guessed-indicator">
+                            <img
+                                src="{{ url_for('static', filename='images/mascot_bob/selection/guessed.png') }}"
+                                alt="Already Guessed"
+                            />
+                        </div>
+                        {% endif %}
+                    </button>
+                </div>
+                {% endif %} {% if samples|length > 2 %}
+                <div class="grid-item">
+                    <button
+                        type="button"
+                        style="position: relative"
+                        onclick="handleSelectionClick('{{ url_for('challenge') }}?index={{ samples[2].index }}', 2)"
+                        onmouseover="startBobHover('hover_2.png')"
+                        onmouseout="stopBobHover()"
+                    >
+                        <img
+                            src="data:image/png;base64,{{ samples[2].img_str }}"
+                            alt="Image 3"
+                        />
+                        {% if samples[2].has_guess %}
+                        <div class="guessed-indicator">
+                            <img
+                                src="{{ url_for('static', filename='images/mascot_bob/selection/guessed.png') }}"
+                                alt="Already Guessed"
+                            />
+                        </div>
+                        {% endif %}
+                    </button>
+                </div>
+                {% endif %} {% if samples|length > 3 %}
+                <div class="grid-item">
+                    <button
+                        type="button"
+                        style="position: relative"
+                        onclick="handleSelectionClick('{{ url_for('challenge') }}?index={{ samples[3].index }}', 3)"
+                        onmouseover="startBobHover('hover_3.png')"
+                        onmouseout="stopBobHover()"
+                    >
+                        <img
+                            src="data:image/png;base64,{{ samples[3].img_str }}"
+                            alt="Image 4"
+                        />
+                        {% if samples[3].has_guess %}
+                        <div class="guessed-indicator">
+                            <img
+                                src="{{ url_for('static', filename='images/mascot_bob/selection/guessed.png') }}"
+                                alt="Already Guessed"
+                            />
+                        </div>
+                        {% endif %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Bottom Row: image 1, (Bob + buttons), image 5 -->
+        <div class="bottom-row">
+            <div class="grid-container-bottom">
+                {% if samples|length > 0 %}
+                <!-- Left cell: Image 1 -->
+                <div class="grid-item">
+                    <button
+                        type="button"
+                        style="position: relative"
+                        onclick="handleSelectionClick('{{ url_for('challenge') }}?index={{ samples[0].index }}', 0)"
+                        onmouseover="startBobHover('hover_0.png')"
+                        onmouseout="stopBobHover()"
+                    >
+                        <img
+                            src="data:image/png;base64,{{ samples[0].img_str }}"
+                            alt="Image 1"
+                        />
+                        {% if samples[0].has_guess %}
+                        <div class="guessed-indicator">
+                            <img
+                                src="{{ url_for('static', filename='images/mascot_bob/selection/guessed.png') }}"
+                                alt="Already Guessed"
+                            />
+                        </div>
+                        {% endif %}
+                    </button>
+                </div>
+                {% endif %}
+
+                <!-- Middle cell: Bob and buttons arranged vertically -->
+                <div class="grid-item button-cell vertical-buttons">
+                    <div class="bob-container">
+                        <img
+                            id="bob"
+                            src="{{ url_for('static', filename='images/mascot_bob/selection/idle.png') }}"
+                            alt="Bob"
+                            class="mascot-selection"
+                        />
+                    </div>
+                    <div class="button-container">
+                        {% if all_guessed %}
+                        <button
+                            type="button"
+                            id="doneButton"
+                            onclick="handleSelectionClick('{{ url_for('score') }}', 'done')"
+                            onmouseover="startBobHover('hover_done.png')"
+                            onmouseout="stopBobHover()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/btn_done.png') }}"
+                                alt="DONE"
+                                class="menu-button"
+                            />
+                        </button>
+                        {% else %}
+                        <button
+                            type="button"
+                            id="doneButton"
+                            disabled
+                            onmouseover="startBobHover('hover_done.png')"
+                            onmouseout="stopBobHover()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/btn_done.png') }}"
+                                alt="DONE"
+                                class="menu-button disabled"
+                            />
+                        </button>
+                        {% endif %}
+                        <button
+                            type="button"
+                            id="backToMain"
+                            onclick="handleSelectionClick('{{ url_for('main') }}', 'back')"
+                            onmouseover="startBobHover('hover_back.png')"
+                            onmouseout="stopBobHover()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/btn_back_main.png') }}"
+                                alt="Back to Main"
+                                class="menu-button"
+                            />
+                        </button>
+                    </div>
+                </div>
+
+                {% if samples|length > 4 %}
+                <!-- Right cell: Image 5 -->
+                <div class="grid-item">
+                    <button
+                        type="button"
+                        style="position: relative"
+                        onclick="handleSelectionClick('{{ url_for('challenge') }}?index={{ samples[4].index }}', 4)"
+                        onmouseover="startBobHover('hover_4.png')"
+                        onmouseout="stopBobHover()"
+                    >
+                        <img
+                            src="data:image/png;base64,{{ samples[4].img_str }}"
+                            alt="Image 5"
+                        />
+                        {% if samples[4].has_guess %}
+                        <div class="guessed-indicator">
+                            <img
+                                src="{{ url_for('static', filename='images/mascot_bob/selection/guessed.png') }}"
+                                alt="Already Guessed"
+                            />
+                        </div>
+                        {% endif %}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <script>
+            // Global flags and interval variables.
+            var selectionClicked = false;
+            var bobHoverInterval;
+            var bobClickedInterval;
+            var bobIdleInterval;
+            var bobInterval; // Used for the talk animation during typing
+            var bobByeInterval; // New variable for the bye animation
+
+            // When all content (including images) is loaded, reveal the body.
+            window.addEventListener("load", function () {
+                document.body.style.visibility = "visible";
+            });
+
+            // Helper: set Bob's image.
+            function setBobImage(filename) {
+                const bobImg = document.getElementById("bob");
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                    filename;
+            }
+
+            // Idle Animation: alternates between idle.png and idle_bis.png.
+            function startIdleAnimation() {
+                if (selectionClicked) return;
+                clearInterval(bobIdleInterval);
+                const bobImg = document.getElementById("bob");
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/selection/idle.png') }}";
+                bobIdleInterval = setInterval(function () {
+                    if (bobImg.src.indexOf("idle.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/idle_bis.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/idle.png') }}";
+                    }
+                }, 500);
+            }
+            function stopIdleAnimation() {
+                clearInterval(bobIdleInterval);
+            }
+
+            // Hover Animation: alternates between a hover image and its _bis version.
+            function startBobHover(hoverFilename) {
+                if (selectionClicked) return;
+                // Stop idle animation when hovering.
+                stopIdleAnimation();
+                clearInterval(bobHoverInterval);
+                var alternateFilename = hoverFilename.replace(
+                    ".png",
+                    "_bis.png"
+                );
+                const bobImg = document.getElementById("bob");
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                    hoverFilename;
+                bobHoverInterval = setInterval(function () {
+                    if (bobImg.src.indexOf(hoverFilename) !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            alternateFilename;
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            hoverFilename;
+                    }
+                }, 500);
+            }
+            // Stop hover animation and resume idle if not clicked.
+            function stopBobHover() {
+                clearInterval(bobHoverInterval);
+                if (!selectionClicked) {
+                    startIdleAnimation();
+                }
+            }
+
+            // Typing Animation for the LLM output.
+            var fullText = `{{ generated_description | safe }}`;
+            var outputElem = document.getElementById("typed-output");
+            var charIndex = 0;
+            var typingDelay = 5; // ms per character
+
+            // Disable guess and back buttons initially.
+            var guessButtons = document.querySelectorAll("#guess-form button");
+            guessButtons.forEach((btn) => (btn.disabled = true));
+            document.getElementById("backToMain").disabled = true;
+
+            // During typing, alternate between talk and idle.
+            bobInterval = setInterval(function () {
+                var bobImg = document.getElementById("bob");
+                if (charIndex < fullText.length) {
+                    if (bobImg.src.indexOf("talk.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/idle.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/talk.png') }}";
+                    }
+                }
+            }, 500);
+
+            function startTypingAnimation() {
+                var typingInterval = setInterval(function () {
+                    if (charIndex < fullText.length) {
+                        outputElem.textContent += fullText.charAt(charIndex);
+                        charIndex++;
+                    } else {
+                        clearInterval(typingInterval);
+                        clearInterval(bobInterval);
+                        // Start idle animation after typing completes.
+                        startIdleAnimation();
+                        // Re-enable guess buttons and back button.
+                        guessButtons.forEach((btn) => (btn.disabled = false));
+                        document.getElementById("backToMain").disabled = false;
+                    }
+                }, typingDelay);
+            }
+
+            // Hover functions for guess buttons.
+            function challengeGuessHover(hoverFilename) {
+                if (charIndex < fullText.length) return;
+                startBobHover(hoverFilename);
+            }
+            function challengeGuessIdle() {
+                if (charIndex < fullText.length) return;
+                stopBobHover();
+            }
+
+            window.addEventListener("load", function () {
+                document.body.style.visibility = "visible";
+                startTypingAnimation();
+            });
+
+            // Clicked Animation: alternates between clicked.png and clicked_bis.png.
+            function startClickedAnimation() {
+                // We do not stop the clicked animation when navigating.
+                const bobImg = document.getElementById("bob");
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                    "clicked.png";
+                bobClickedInterval = setInterval(function () {
+                    if (bobImg.src.indexOf("clicked.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            "clicked_bis.png";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            "clicked.png";
+                    }
+                }, 500);
+            }
+
+            // New: Bye Animation: alternates between bye.png and bye_bis.png.
+            function startByeAnimation() {
+                const bobImg = document.getElementById("bob");
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                    "bye.png";
+                bobByeInterval = setInterval(function () {
+                    if (bobImg.src.indexOf("bye_bis.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            "bye.png";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/selection/') }}" +
+                            "bye_bis.png";
+                    }
+                }, 500);
+            }
+
+            // Handle selection click: disable interactions, stop other animations,
+            // start appropriate animation and trigger navigation.
+            function handleSelectionClick(url, btnId) {
+                selectionClicked = true;
+                var buttonsTop = document.querySelectorAll(
+                    ".grid-container-top button"
+                );
+                var buttonsBottom = document.querySelectorAll(
+                    ".grid-container-bottom button"
+                );
+                buttonsTop.forEach((btn) => (btn.disabled = true));
+                buttonsBottom.forEach((btn) => (btn.disabled = true));
+
+                clearInterval(bobHoverInterval);
+                clearInterval(bobInterval);
+                stopIdleAnimation();
+
+                document.body.style.pointerEvents = "none";
+
+                // If the button clicked is the back button, run the bye animation,
+                // otherwise run the default clicked animation.
+                if (btnId === "back") {
+                    startByeAnimation();
+                } else {
+                    startClickedAnimation();
+                }
+
+                // Trigger navigation after a short delay.
+                // The animation continues running until the new page loads.
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 2000);
+            }
+        </script>
+    </body>
+</html>

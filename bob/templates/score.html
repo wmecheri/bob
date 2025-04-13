@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Score</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <style>
+            /* Hide entire page content until everything has loaded */
+            body {
+                visibility: hidden;
+            }
+        </style>
+    </head>
+    <body class="score-page">
+        <!-- Centered page wrapper -->
+        <div class="page-wrapper">
+            <!-- Replace raw score with corresponding image based on score value -->
+            <img
+                src="{{ url_for('static', filename='images/mascot_bob/score/' ~ score|string ~ '.png') }}"
+                alt="Score: {{ score }}"
+            />
+
+            <!-- Score list showing cached image thumbnails with result icons inside buttons -->
+            <ul class="score-list">
+                {% for item in detailed %}
+                <li>
+                    <!-- Button acting as a link to the detail page -->
+                    <button
+                        onclick="window.location.href='{{ url_for('detail') }}?index={{ item.index }}'"
+                    >
+                        <!-- Thumbnail image -->
+                        <img
+                            src="data:image/png;base64,{{ item.img_str }}"
+                            alt="Image {{ item.index }}"
+                            class="score-thumb"
+                        />
+                        <!-- Check or Cross icon as images -->
+                        {% if item.correct %}
+                        <img
+                            src="{{ url_for('static', filename='images/mascot_bob/score/check.png') }}"
+                            alt="Correct"
+                            class="result-icon"
+                        />
+                        {% else %}
+                        <img
+                            src="{{ url_for('static', filename='images/mascot_bob/score/cross.png') }}"
+                            alt="Incorrect"
+                            class="result-icon"
+                        />
+                        {% endif %}
+                    </button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Back to Main button using btn_back_main image -->
+            <button
+                onclick="window.location.href='{{ url_for('main') }}'"
+                class="back-main-button"
+            >
+                <img
+                    src="{{ url_for('static', filename='images/finish.png') }}"
+                    alt="Back to Main"
+                />
+            </button>
+        </div>
+
+        <!-- Inline script to reveal body after full page load -->
+        <script>
+            window.addEventListener("load", function () {
+                document.body.style.visibility = "visible";
+            });
+        </script>
+    </body>
+</html>

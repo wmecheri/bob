@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Challenge Page</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <style>
+            /* Optionally hide the body until fully loaded */
+            body {
+                visibility: hidden;
+            }
+        </style>
+    </head>
+    <body class="challenge-page">
+        <div class="challenge-container">
+            <!-- Left Column: Image + Debug Info -->
+            <div class="left-column">
+                <div class="image-section">
+                    <img
+                        src="data:image/png;base64,{{ img_str }}"
+                        alt="Selected Image"
+                    />
+                </div>
+                <!-- Debug Toggle Button (remains always enabled) -->
+                <button id="toggle-debug-btn" class="toggle-debug-btn">
+                    Show Debug
+                </button>
+                <div class="debug-box">
+                    <h3>🛠 Debug Info</h3>
+                    <p>
+                        <strong>Predicted Genre:</strong> {{ predicted_genre }}
+                    </p>
+                    <p>
+                        <strong>Predicted Style:</strong> {{ predicted_style }}
+                    </p>
+                    <p><strong>Ground Truth Genre:</strong> {{ gt_genre }}</p>
+                    <p><strong>Ground Truth Style:</strong> {{ gt_style }}</p>
+                    {% if history %}
+                    <p><strong>LLM Output History:</strong></p>
+                    <ol>
+                        {% for item in history %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ol>
+                    {% else %}
+                    <p><em>No previous LLM descriptions.</em></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Middle Column: LLM Description (Animated) -->
+            <div class="middle-column">
+                <div class="description-box">
+                    <p id="typed-output"></p>
+                </div>
+            </div>
+
+            <!-- Right Column: Bob and Guess Buttons -->
+            <div class="right-column">
+                <!-- Back to Selection button (this one is initially disabled) -->
+                <button
+                    id="backButton"
+                    class="back-button"
+                    onclick="window.location.href='/selection'"
+                    disabled
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/btn_back_selection.png') }}"
+                        alt="Back to Selection"
+                    />
+                </button>
+                <!-- Container for Bob and Guess Buttons -->
+                <div class="vertical-buttons-challenge">
+                    <img
+                        id="bob"
+                        src="{{ url_for('static', filename='images/mascot_bob/challenge/idle.png') }}"
+                        alt="Bob"
+                        class="mascot-challenge"
+                    />
+                    <form method="POST" action="/submit_guess" id="guess-form">
+                        <input type="hidden" name="index" value="{{ index }}" />
+                        <!-- All guess buttons are initially disabled -->
+                        <button
+                            type="submit"
+                            name="guess"
+                            value="OK"
+                            class="guess-button"
+                            disabled
+                            onmouseover="challengeGuessHoverOK()"
+                            onmouseout="challengeGuessIdle()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/guess_ok.png') }}"
+                                alt="OK"
+                            />
+                        </button>
+
+                        <button
+                            type="submit"
+                            name="guess"
+                            value="NOT OK"
+                            class="guess-button"
+                            disabled
+                            onmouseover="challengeGuessHover()"
+                            onmouseout="challengeGuessIdle()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/guess_not_ok.png') }}"
+                                alt="NOT OK"
+                            />
+                        </button>
+                        <button
+                            type="submit"
+                            name="guess"
+                            value="GENRE"
+                            class="guess-button"
+                            disabled
+                            onmouseover="challengeGuessHover()"
+                            onmouseout="challengeGuessIdle()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/guess_genre.png') }}"
+                                alt="GENRE"
+                            />
+                        </button>
+                        <button
+                            type="submit"
+                            name="guess"
+                            value="STYLE"
+                            class="guess-button"
+                            disabled
+                            onmouseover="challengeGuessHover()"
+                            onmouseout="challengeGuessIdle()"
+                        >
+                            <img
+                                src="{{ url_for('static', filename='images/guess_style.png') }}"
+                                alt="STYLE"
+                            />
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Store the LLM output text and initial settings.
+            var fullText = `{{ generated_description | safe }}`;
+            var outputElem = document.getElementById("typed-output");
+            var charIndex = 0;
+            var typingDelay = 5; // milliseconds per character
+
+            // Disable guess and back buttons initially.
+            var guessButtons = document.querySelectorAll("#guess-form button");
+            guessButtons.forEach((btn) => (btn.disabled = true));
+            document.getElementById("backButton").disabled = true;
+
+            // Talk animation: alternate between talk.png and talk_bis.png during typing.
+            var bobInterval = setInterval(function () {
+                var bobImg = document.getElementById("bob");
+                if (charIndex < fullText.length) {
+                    if (bobImg.src.indexOf("talk.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/talk_bis.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/talk.png') }}";
+                    }
+                }
+            }, 500);
+
+            // Idle animation: alternates between idle.png and idle_bis.png.
+            var challengeIdleInterval;
+            function startIdleAnimationChallenge() {
+                if (charIndex < fullText.length) return; // Do not start if typing (talk) is active.
+                clearInterval(challengeIdleInterval);
+                const bobImg = document.getElementById("bob");
+                // Start with idle image.
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/challenge/idle.png') }}";
+                challengeIdleInterval = setInterval(function () {
+                    if (bobImg.src.indexOf("idle_bis.png") === -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/idle_bis.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/idle.png') }}";
+                    }
+                }, 500);
+            }
+            function stopIdleAnimationChallenge() {
+                clearInterval(challengeIdleInterval);
+            }
+
+            // Hover animation: alternates between a hover image and its _bis version.
+            var challengeHoverInterval;
+            function startChallengeHover(hoverImage) {
+                if (charIndex < fullText.length) return;
+                stopIdleAnimationChallenge();
+                clearInterval(challengeHoverInterval);
+                const bobImg = document.getElementById("bob");
+                // Compute the alternate (bis) filename.
+                var hoverBis = hoverImage.replace(".png", "_bis.png");
+                // Start with the base hover image.
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/challenge/') }}" +
+                    hoverImage;
+                challengeHoverInterval = setInterval(function () {
+                    if (bobImg.src.indexOf(hoverBis) !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/') }}" +
+                            hoverImage;
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/') }}" +
+                            hoverBis;
+                    }
+                }, 500);
+            }
+            function stopChallengeHover() {
+                clearInterval(challengeHoverInterval);
+                if (charIndex >= fullText.length) {
+                    startIdleAnimationChallenge();
+                }
+            }
+
+            // Typing animation for the LLM output.
+            function startTypingAnimation() {
+                var typingInterval = setInterval(function () {
+                    if (charIndex < fullText.length) {
+                        outputElem.textContent += fullText.charAt(charIndex);
+                        charIndex++;
+                    } else {
+                        clearInterval(typingInterval);
+                        clearInterval(bobInterval); // Stop talk animation.
+                        // Set Bob's image to idle and start the idle animation.
+                        document.getElementById("bob").src =
+                            "{{ url_for('static', filename='images/mascot_bob/challenge/idle.png') }}";
+                        startIdleAnimationChallenge();
+                        // Re-enable guess and back buttons.
+                        guessButtons.forEach((btn) => (btn.disabled = false));
+                        document.getElementById("backButton").disabled = false;
+                    }
+                }, typingDelay);
+            }
+
+            // Hover functions for guess buttons.
+            // For the OK button, toggle between hover_guess_ok.png and hover_guess_ok_bis.png.
+            function challengeGuessHoverOK() {
+                if (charIndex < fullText.length) return;
+                startChallengeHover("hover_guess_ok.png");
+            }
+            // For non-OK buttons, toggle between hover_guess.png and hover_guess_bis.png.
+            function challengeGuessHover() {
+                if (charIndex < fullText.length) return;
+                startChallengeHover("hover_guess.png");
+            }
+            function challengeGuessIdle() {
+                if (charIndex < fullText.length) return;
+                stopChallengeHover();
+            }
+
+            // Start typing when the window loads; reveal the body.
+            window.addEventListener("load", function () {
+                document.body.style.visibility = "visible";
+                startTypingAnimation();
+            });
+        </script>
+    </body>
+</html>

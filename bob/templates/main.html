@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Main Page</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <div class="main-menu">
+            <img
+                src="{{ url_for('static', filename='images/title.png') }}"
+                alt="Main Title"
+                class="menu-title"
+            />
+            <img
+                id="bob"
+                src="{{ url_for('static', filename='images/mascot_bob/main/bob_main.png') }}"
+                alt="Bob"
+                class="mascot-main"
+            />
+            <button id="toSelection" class="menu-button">
+                <img
+                    src="{{ url_for('static', filename='images/btn_goto_selection.png') }}"
+                    alt="Go to Selection"
+                />
+            </button>
+        </div>
+
+        <!-- Inline JavaScript -->
+        <script>
+            // Global variables to hold interval IDs.
+            var bobIdleInterval;
+            var bobClickedInterval;
+
+            // Function to start the idle animation.
+            function startIdleAnimation() {
+                stopIdleAnimation();
+                const bobImg = document.getElementById("bob");
+                // Set the initial idle image.
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/main/bob_main.png') }}";
+                bobIdleInterval = setInterval(function () {
+                    // Toggle between the two idle images.
+                    if (bobImg.src.indexOf("bob_main_bis.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/main/bob_main.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/main/bob_main_bis.png') }}";
+                    }
+                }, 500);
+            }
+
+            // Function to stop the idle animation.
+            function stopIdleAnimation() {
+                clearInterval(bobIdleInterval);
+            }
+
+            // Function to start the clicked animation.
+            function startClickedAnimation() {
+                // Stop idle animation if it's running.
+                stopIdleAnimation();
+                const bobImg = document.getElementById("bob");
+                // Set the initial clicked image.
+                bobImg.src =
+                    "{{ url_for('static', filename='images/mascot_bob/main/clicked.png') }}";
+                bobClickedInterval = setInterval(function () {
+                    // Toggle between clicked images.
+                    if (bobImg.src.indexOf("clicked_bis.png") !== -1) {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/main/clicked.png') }}";
+                    } else {
+                        bobImg.src =
+                            "{{ url_for('static', filename='images/mascot_bob/main/clicked_bis.png') }}";
+                    }
+                }, 500);
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                var bob = document.getElementById("bob");
+                var selectionBtn = document.getElementById("toSelection");
+
+                if (!bob || !selectionBtn) {
+                    console.log("Missing elements!");
+                    return;
+                }
+
+                console.log("Page loaded - starting idle animation");
+                // Start the idle animation when the page loads.
+                startIdleAnimation();
+
+                selectionBtn.addEventListener("click", function (e) {
+                    // Prevent the browser from navigating immediately.
+                    e.preventDefault();
+
+                    console.log(
+                        "Button clicked, starting clicked animation..."
+                    );
+                    // Start the clicked animation.
+                    startClickedAnimation();
+
+                    // Optionally disable the button to prevent extra clicks.
+                    selectionBtn.disabled = true;
+
+                    // After a delay (e.g., 2000ms), navigate to the new page.
+                    // Notice we do NOT stop the clicked animation here, so it continues until navigation.
+                    setTimeout(function () {
+                        window.location.href = "/selection";
+                    }, 2000);
+                });
+            });
+        </script>
+    </body>
+</html>

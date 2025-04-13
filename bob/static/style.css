@@ -1,0 +1,451 @@
+/* Reset & Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    font-family: "Patrick Hand", sans-serif;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+/* ----------------------------- */
+/* MAIN PAGE STYLES              */
+/* ----------------------------- */
+.main-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertical centering */
+    align-items: center;
+    min-height: 100vh;
+    gap: 0.3rem;
+    padding: 0.3rem;
+}
+
+.menu-title {
+    max-width: 45vw;
+    width: 100%;
+    height: auto;
+}
+
+.mascot-main {
+    max-width: 20vw;
+    width: 100%;
+    height: auto;
+}
+
+.menu-button img {
+    width: 17vw;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+/* ----------------------------- */
+/* SELECTION PAGE STYLES         */
+/* ----------------------------- */
+
+body.selection-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 95vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Top Row: reduced gap between cells */
+.top-row .grid-container-top {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 5rem; /* Reduced from 10rem */
+    margin-bottom: 1rem;
+}
+
+/* Extra top margin on first and last grid items in top row */
+.top-row .grid-container-top .grid-item:first-child,
+.top-row .grid-container-top .grid-item:last-child {
+    margin-top: 2rem;
+}
+
+/* Bottom Row: increased gap between cells */
+.bottom-row .grid-container-bottom {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10rem; /* Increased from 1.5rem */
+}
+
+/* Grid item styling */
+.grid-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.grid-item img {
+    width: 22vw;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 0.2rem;
+    margin: 0;
+}
+
+/* Vertical-buttons for middle bottom cell (divides the cell vertically) */
+.vertical-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Bob container: ensure full image is visible, not cropped */
+.bob-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.2rem;
+}
+.bob-container .mascot-selection {
+    max-width: 20vw; /* Increased Bob's image size */
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* Ensure the entire image is visible */
+}
+
+/* Button container: two buttons arranged horizontally under Bob */
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Button container: reduce width of images inside these buttons to 50% */
+.button-container button {
+    width: 10vw;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.button-container button img {
+    width: 50%; /* Reduced to 50% of the button width */
+    height: auto;
+    object-fit: contain; /* Ensure full image is shown */
+}
+
+/* Disabled button appearance: transparent */
+button:disabled {
+    opacity: 0.7;
+}
+
+/* Ensure all selection buttons are positioned relative so that child absolute elements
+   (like the guessed indicator) are positioned relative to the button */
+.selection-page button {
+    position: relative;
+}
+
+/* ----------------------------- */
+/* CHALLENGE PAGE STYLES         */
+/* ----------------------------- */
+
+/* Centering the challenge page content */
+body.challenge-page {
+    display: flex;
+    justify-content: center; /* Horizontal centering only */
+    /* Remove vertical centering */
+    min-height: 90vh;
+    margin: 0;
+}
+
+.challenge-container {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 1fr;
+    gap: 0.3rem;
+    padding: 0.3rem;
+}
+
+/* Left Column: Image + Debug Info */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: center;
+}
+
+.image-section {
+    width: 90%;
+    max-height: 80vh; /* Prevents the container from growing too tall */
+    display: flex; /* Enable flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    overflow: hidden; /* Hide any overflow */
+    margin-top: 10vh; /* Add top margin */
+}
+
+.image-section img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Scale image to be fully visible */
+    margin: auto;
+    border-radius: 0.2rem;
+}
+
+.debug-box {
+    display: none; /* Hide debug info by default */
+    background-color: #eaeaea;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
+    font-size: 1rem; /* Increased debug font size */
+}
+
+.toggle-debug-btn {
+    font-size: 0.5rem; /* Small font size */
+    padding: 0.2rem 0.4rem; /* Small padding */
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    border-radius: 0.2rem;
+    cursor: pointer;
+    margin-top: 0.2rem; /* Space below image */
+}
+
+/* Middle Column: LLM Description */
+.middle-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.3rem;
+    align-items: center;
+    text-align: center;
+}
+
+.description-box {
+    background-color: #fff;
+    padding: 0.5rem;
+    border-radius: 0.3rem;
+    font-size: 2rem;
+    line-height: 1.3;
+    font-weight: bold;
+    text-align: center;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+/* Right Column: Bob and Guess Buttons */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: center;
+    margin-top: 5vh;
+}
+
+/* Position back button in the upper right */
+.back-button {
+    position: fixed;
+    top: 0.1vh;
+    right: 0.1vh;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.back-button img {
+    width: 7vw;
+    height: auto;
+}
+
+/* New container: Arrange Bob and guess buttons vertically */
+.vertical-buttons-challenge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* Remove grid container for guess buttons and arrange the form vertically */
+/* --- Updated: Remove gap for guess buttons --- */
+#guess-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0; /* No gap between guess buttons */
+}
+
+/* Optional: Adjust guess-button styling */
+.guess-button {
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Ensure images inside guess buttons fill the button without cropping */
+.guess-button img {
+    width: 15vw;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Existing mascot-challenge remains the same */
+.mascot-challenge {
+    max-width: 20vw;
+    width: 100%;
+    height: auto;
+}
+
+/* ======================================================================
+   SCORE PAGE STYLES
+   ====================================================================== */
+body.score-page,
+body.score {
+    padding: 1rem;
+    text-align: center;
+    overflow: hidden;
+    /* Optionally you can add a background color or adjust font-size here */
+}
+
+/* Wrapper to center all content both vertically and horizontally */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Big score text */
+body.score-page h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Arrange score thumbnails evenly in a grid */
+.score-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    width: 90%;
+    justify-items: center;
+}
+
+.score-list li {
+    /* Remove any extra background, padding, or border-radius if present */
+    text-align: center;
+}
+
+/* Style for the image thumbnail: force square shape */
+.score-thumb {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 0.2rem;
+}
+
+/* Result icon styles for the check or cross images */
+.result-icon {
+    display: block;
+    width: 8rem; /* Adjust size as needed */
+    margin: 0.5rem auto 0;
+}
+
+/* Back to Main button styles */
+.back-main-button {
+    margin-top: 1rem;
+    padding: 0.3rem 0.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.back-main-button img {
+    width: 15vw;
+    height: auto;
+}
+
+/* ======================================================================
+   DETAIL PAGE STYLES
+   ====================================================================== */
+body.detail-page {
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.6rem;
+    overflow: hidden;
+}
+
+.detail-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    justify-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    text-align: center;
+}
+
+.detail-left,
+.detail-middle,
+.detail-right {
+    /* Additional styling if needed */
+}
+
+.detail-image {
+    width: 100%;
+    max-width: 90%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 0.2rem;
+}
+
+.detail-middle h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.detail-middle p {
+    font-size: 1rem;
+    margin: 0.2rem 0;
+}
+
+.bob-detail {
+    width: 100%;
+    max-width: 15vw;
+    height: auto;
+}
+
+.back-button-detail {
+    position: fixed;
+    top: 10px; /* Adjust to your preference */
+    right: 10px; /* Adjust to your preference */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    z-index: 1000; /* Ensures the button is on top */
+}
+
+.back-button-detail img {
+    width: 7vw; /* Adjust size as needed */
+    height: auto;
+}

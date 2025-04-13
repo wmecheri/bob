@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Detail Page</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body class="detail-page">
+        <div class="challenge-container">
+            <!-- Left Column -->
+            <div class="left-column">
+                <div class="image-section">
+                    <img
+                        src="data:image/png;base64,{{ img_str }}"
+                        alt="Selected Image"
+                    />
+                </div>
+            </div>
+
+            <!-- Middle Column -->
+            <div class="middle-column">
+                <div class="description-box">
+                    {% if correct and pred_genre == gt_genre and pred_style ==
+                    gt_style %}
+                    <!-- Bob is proud -->
+                    <p><strong>Ha! Nailed it!</strong></p>
+                    <p>You guessed <em>{{ guess }}</em>, and I was right!</p>
+                    <p>
+                        I knew it was <em>{{ pred_genre }}</em> and
+                        <em>{{ pred_style }}</em>. Great minds think alike!
+                    </p>
+
+                    {% elif correct %}
+                    <!-- Bob got caught -->
+                    <p><strong>Oops, you got me...</strong></p>
+                    <p>You guessed <em>{{ guess }} correctly.</em></p>
+                    <p>
+                        I thought it was <em>{{ pred_genre }}</em> and
+                        <em>{{ pred_style }}</em>, but it was actually
+                        <em>{{ gt_genre }}</em> and <em>{{ gt_style }}</em>. I’m
+                        sorry...
+                    </p>
+
+                    {% elif not correct and pred_genre == gt_genre and
+                    pred_style == gt_style %}
+                    <!-- Bob is outraged you doubted him when he was 100% right -->
+                    <p><strong>What?! HOW DARE YOU!</strong></p>
+                    <p>You said I was wrong, but I was absolutely right!</p>
+                    <p>
+                        It <em>was</em> <strong>{{ pred_genre }}</strong> and
+                        <strong>{{ pred_style }}</strong>, exactly as I said.
+                        Unbelievable.
+                    </p>
+
+                    {% elif not correct and pred_genre == gt_genre %}
+                    <!-- Bob complains about being doubted on genre -->
+                    <p><strong>Excuse me?!</strong></p>
+                    <p>
+                        You doubted me, but I *clearly* nailed the genre — it
+                        was
+                        <em>{{ pred_genre }}</em> just like I said.
+                    </p>
+                    <p>
+                        (Heh... good thing they didn’t notice I totally missed
+                        the style.)
+                    </p>
+
+                    {% elif not correct and pred_style == gt_style %}
+                    <!-- Bob complains about being doubted on style -->
+                    <p><strong>Really now?</strong></p>
+                    <p>
+                        You called me wrong, but I *got* the
+                        <em>{{ pred_style }}</em> style spot on!
+                    </p>
+                    <p>
+                        (Whew... at least they didn’t catch my {{ pred_genre }}
+                        genre mistake, it was {{ gt_genre }}...)
+                    </p>
+
+                    <!-- Bob tricked us -->
+                    <p><strong>Hehe, I tricked you!</strong></p>
+                    <p>You guessed <em>{{ guess }} incorrectly</em>!</p>
+                    <p>
+                        I thought it was <em>{{ pred_genre }}</em> and
+                        <em>{{ pred_style }}</em> while it's actually
+                        <em>{{ gt_genre }}</em> and <em>{{ gt_style }}</em>.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <div class="vertical-buttons-challenge">
+                    {% if correct and pred_genre == gt_genre and pred_style ==
+                    gt_style %}
+                    <img
+                        id="bob"
+                        src="{{ url_for('static', filename='images/mascot_bob/detail/correct_proud.png') }}"
+                        alt="Bob: Proud"
+                        class="mascot-challenge"
+                    />
+                    {% elif correct %}
+                    <img
+                        id="bob"
+                        src="{{ url_for('static', filename='images/mascot_bob/detail/correct.png') }}"
+                        alt="Bob: Caught"
+                        class="mascot-challenge"
+                    />
+                    {% elif pred_genre == gt_genre and pred_style == gt_style %}
+                    <img
+                        id="bob"
+                        src="{{ url_for('static', filename='images/mascot_bob/detail/outraged.png') }}"
+                        alt="Bob: Outraged"
+                        class="mascot-challenge"
+                    />
+                    {% else %}
+                    <img
+                        id="bob"
+                        src="{{ url_for('static', filename='images/mascot_bob/detail/incorrect.png') }}"
+                        alt="Bob: Incorrect"
+                        class="mascot-challenge"
+                    />
+                    {% endif %}
+                    <button
+                        class="back-button-detail"
+                        onclick="window.location.href='{{ url_for('score') }}'"
+                    >
+                        <img
+                            src="{{ url_for('static', filename='images/btn_back_score.png') }}"
+                            alt="Back to Score"
+                        />
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.addEventListener("load", function () {
+                var bobImg = document.getElementById("bob");
+                setTimeout(function () {
+                    var isCorrect = {{ "true" if correct else "false" }};
+                    var isProud = {{ "true" if correct and pred_genre == gt_genre and pred_style == gt_style else "false" }};
+                    var isOutraged = {{ "true" if not correct and pred_genre == gt_genre and pred_style == gt_style else "false" }};
+
+                    if (isProud) {
+                        bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct_proud.png') }}";
+                        setInterval(function () {
+                            if (bobImg.src.includes("correct_proud_bis.png")) {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct_proud.png') }}";
+                            } else {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct_proud_bis.png') }}";
+                            }
+                        }, 500);
+                    } else if (isOutraged) {
+                        bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/outraged.png') }}";
+                        setInterval(function () {
+                            if (bobImg.src.includes("outraged_bis.png")) {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/outraged.png') }}";
+                            } else {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/outraged_bis.png') }}";
+                            }
+                        }, 500);
+                    } else if (isCorrect) {
+                        bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct.png') }}";
+                        setInterval(function () {
+                            if (bobImg.src.includes("correct_bis.png")) {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct.png') }}";
+                            } else {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/correct_bis.png') }}";
+                            }
+                        }, 500);
+                    } else {
+                        bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/incorrect.png') }}";
+                        setInterval(function () {
+                            if (bobImg.src.includes("incorrect_bis.png")) {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/incorrect.png') }}";
+                            } else {
+                                bobImg.src = "{{ url_for('static', filename='images/mascot_bob/detail/incorrect_bis.png') }}";
+                            }
+                        }, 500);
+                    }
+                }, 100);
+            });
+        </script>
+    </body>
+</html>
